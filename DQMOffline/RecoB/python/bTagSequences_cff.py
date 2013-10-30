@@ -34,6 +34,7 @@ btagSequence = cms.Sequence(
 
 #select good primary vertex
 from CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi import goodOfflinePrimaryVertices
+mygoodOfflinePrimaryVertices = goodOfflinePrimaryVertices.clone()
 
 #to select events passing a scpecific trigger
 from HLTrigger.HLTfilters.hltHighLevel_cfi import *

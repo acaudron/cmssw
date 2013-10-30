@@ -8,13 +8,16 @@
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include "DataFormats/PatCandidates/interface/Jet.h" //genJets 
+
 using namespace reco;
+using namespace pat; //genJets
 using namespace edm;
 using namespace std;
 using namespace RecoBTag;
 //using namespace BTagMCTools;
 
-typedef std::pair<Jet, reco::JetFlavour> JetWithFlavour;
+typedef std::pair<reco::Jet, reco::JetFlavour> JetWithFlavour;
 
 BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pSet) :
   partonKinematics(pSet.getParameter< bool >("partonKinematics")),
@@ -43,7 +46,8 @@ BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pS
   flavPlots_(pSet.getParameter< std::string >("flavPlots")),
   makeDiffPlots_(pSet.getParameter< bool >("differentialPlots")),
   jetCorrector(pSet.getParameter<std::string>("jetCorrection")),
-  jetMatcher(pSet.getParameter<edm::ParameterSet>("recJetMatching"))
+  jetMatcher(pSet.getParameter<edm::ParameterSet>("recJetMatching")),
+  useGenJets(pSet.getParameter< bool >("useGenJets"))
 {
   //mcPlots_ : 1=b+c+l+ni; 2=all+1; 3=1+d+u+s+g; 4=3+all . Default is 2. Don't use 0.
   if(flavPlots_.find("dusg")<15){
@@ -64,6 +68,8 @@ BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pS
     default: electronPlots = false; muonPlots = false; tauPlots = false;
   }
   
+  genJetToken = mayConsume<vector<GenJet>>(pSet.getParameter<InputTag>("genJets")); //genjets
+
   genToken = mayConsume<GenEventInfoProduct>(edm::InputTag("generator"));
   jetToken = consumes<JetFlavourMatchingCollection>(pSet.getParameter<InputTag>("jetMCSrc"));
   slInfoToken = consumes<SoftLeptonTagInfoCollection>(pSet.getParameter<InputTag>("softLeptonInfo"));
@@ -325,6 +331,9 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
   LogDebug("Info") << "Event weight is: " << weight;
     
   if (finalizeOnly) return;
+
+  edm::Handle<vector<GenJet>> genJetCol; //genJets
+  iEvent.getByToken(genJetToken, genJetCol); //genJets
     
   edm::Handle<JetFlavourMatchingCollection> jetMC;
   FlavourMap flavours;
@@ -366,7 +375,10 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
-
+      if (!getJetWithGenJet(tagI->first, genJetCol))
+	continue;
+      //std::cout<<"pass genJet"<<std::endl;	  
+	  
       for (int iPlotter = 0; iPlotter != plotterSize; ++iPlotter) {
 	      bool inBin = false;
 	      if (partonKinematics)
@@ -409,6 +421,8 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
+      if (!getJetWithGenJet(tagI->first, genJetCol))
+	continue;
 
       for(int iPlotter = 0; iPlotter != plotterSize; ++iPlotter) {
         bool inBin = false;
@@ -475,7 +489,7 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
 
     for (unsigned int iTagInfos = 0; iTagInfos < nTagInfos; ++iTagInfos) {
       vector<const BaseTagInfo*> baseTagInfos(nInputTags);
-      edm::RefToBase<Jet> jetRef;
+      edm::RefToBase<reco::Jet> jetRef;
       for (unsigned int iTagInfo = 0; iTagInfo < nInputTags; iTagInfo++) {
         const BaseTagInfo &baseTagInfo = (*tagInfoHandles[iTagInfo])[iTagInfos];
         if (iTagInfo == 0)
@@ -499,6 +513,8 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
+      if (!getJetWithGenJet(jetRef, genJetCol))
+	continue;
 
       for (int iPlotter = 0; iPlotter != plotterSize; ++iPlotter) {
 	      bool inBin = false;
@@ -515,7 +531,25 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
   }
 }
 
-bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<Jet> jetRef, const FlavourMap& flavours,
+
+bool BTagPerformanceAnalyzerMC::getJetWithGenJet(edm::RefToBase<reco::Jet> jetRef, edm::Handle<vector<reco::GenJet>> genJetcol)
+{
+  if(!useGenJets) return true;
+  const vector<reco::GenJet> *genJets = genJetcol.product(); 
+  for (unsigned int iGenJet = 0; iGenJet != genJets->size(); ++iGenJet) {
+    reco::GenJet genJet = genJets->at(iGenJet);
+    double ptrel = fabs(jetRef->pt()-genJet.pt())/jetRef->pt();
+    double deta = jetRef->eta() - genJet.eta();
+    double dphi = fabs(jetRef->phi()-genJet.phi()); if (dphi>double(M_PI)) dphi-=double(2*M_PI);
+    double dr =  sqrt(deta*deta + dphi*dphi);
+    //std::cout<<"in the genjet loop"<<ptrel<<" "<<dr<<std::endl;
+    if (dr<0.4 && ptrel<3.0) return true; 
+  }
+  std::cout<<" not pass"<<std::endl; 
+  return false;
+}
+
+bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<reco::Jet> jetRef, const FlavourMap& flavours,
 	JetWithFlavour & jetWithFlavour, const edm::EventSetup & es)
 {
   edm::ProductID recProdId = jetRef.id();
@@ -526,14 +560,14 @@ bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<Jet> jetRef, 
   if (!eventInitialized) {
     jetCorrector.setEventSetup(es);
     if (recProdId != refProdId) {
-      edm::RefToBaseVector<Jet> refJets;
+      edm::RefToBaseVector<reco::Jet> refJets;
       for(FlavourMap::const_iterator iter = flavours.begin();
           iter != flavours.end(); ++iter)
         refJets.push_back(iter->first);
-      const edm::RefToBaseProd<Jet> recJetsProd(jetRef);
-      edm::RefToBaseVector<Jet> recJets;
+      const edm::RefToBaseProd<reco::Jet> recJetsProd(jetRef);
+      edm::RefToBaseVector<reco::Jet> recJets;
       for(unsigned int i = 0; i < recJetsProd->size(); i++)
-        recJets.push_back(edm::RefToBase<Jet>(recJetsProd, i));
+        recJets.push_back(edm::RefToBase<reco::Jet>(recJetsProd, i));
       jetMatcher.matchCollections(refJets, recJets, es);
     }
     eventInitialized = true;

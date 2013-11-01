@@ -87,11 +87,11 @@ if runOnMC:
     process.bTagValidation.allHistograms = True 
     #process.bTagValidation.fastMC = True
     process.bTagValidation.applyPtHatWeight = False
-    process.bTagValidation.flavPlots = "allbcl" #if contains "noall" plots for all jets not booked, if contains "dusg" all histograms booked, default : all, b, c, udsg, ni
+    process.bTagValidation.flavPlots = "allbcldusg" #if contains "noall" plots for all jets not booked, if contains "dusg" all histograms booked, default : all, b, c, udsg, ni
     process.bTagValidation.genJets = cms.InputTag("ak5GenJets")
-    process.bTagValidation.useGenJets = cms.bool(False)
+    process.bTagValidation.useGenJets = cms.bool(True)
     process.bTagValidation.ptRecJetMin = cms.double(20.)
-    process.bTagValidation.ptRecJetMin = cms.double(40.)
+    #process.bTagValidation.ptRecJetMin = cms.double(40.)
 else:
     process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 
@@ -129,13 +129,15 @@ process.PoolSource.fileNames = [
 #    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PRE_ST62_V8-v1/00000/72477A84-F93B-E311-BF63-003048FFD720.root',
 #    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PRE_ST62_V8-v1/00000/12A06D7A-F93B-E311-AA64-003048678BEA.root'
 
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/32B914B1-513B-E311-B817-0030486792A8.root',
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/4429961C-513B-E311-90A6-0026189437FC.root',
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/6EA9E977-573B-E311-9350-0026189438D6.root',
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/BA19F951-523B-E311-A4C9-002618943854.root',
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/BADC6FE4-533B-E311-AB36-00304867D836.root',
-#    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/CEE198D3-543B-E311-A755-003048FFD75C.root' 
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/32B914B1-513B-E311-B817-0030486792A8.root',
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/4429961C-513B-E311-90A6-0026189437FC.root',
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/6EA9E977-573B-E311-9350-0026189438D6.root',
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/BA19F951-523B-E311-A4C9-002618943854.root',
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/BADC6FE4-533B-E311-AB36-00304867D836.root',
+    '/store/relval/CMSSW_7_0_0_pre6/RelValTTbar/GEN-SIM-RECO/PU_PRE_ST62_V8-v1/00000/CEE198D3-543B-E311-A755-003048FFD75C.root' 
+    
+#    '/store/relval/CMSSW_7_0_0_pre6/RelValQCD_Pt_80_120/GEN-SIM-RECO/PRE_ST62_V8-v1/00000/2205CA04-0C3C-E311-9ECC-00248C0BE018.root',
+#    '/store/relval/CMSSW_7_0_0_pre6/RelValQCD_Pt_80_120/GEN-SIM-RECO/PRE_ST62_V8-v1/00000/969C2BB0-073C-E311-B62A-003048FFD796.root'
 
-    '/store/relval/CMSSW_6_1_2_SLHC8_patch3/RelValTTbar_14TeV/GEN-SIM-RECO/PU_STAR17_61_V1A_FlatBS_SpecialTRK-v2/00000/0061F9EB-E421-E311-A5D7-00259059642A.root'
 ]
 

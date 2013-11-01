@@ -113,7 +113,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
 
   CorrectJet jetCorrector;
   MatchJet jetMatcher;
-  bool useGenJets;
+  bool useGenJets; //genJets
 
   bool eventInitialized;
   bool electronPlots, muonPlots, tauPlots;

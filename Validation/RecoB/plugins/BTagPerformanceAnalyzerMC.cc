@@ -376,7 +376,7 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
       if (!getJetWithGenJet(tagI->first, genJetCol))
-	continue;
+	continue;//genJets
       //std::cout<<"pass genJet"<<std::endl;	  
 	  
       for (int iPlotter = 0; iPlotter != plotterSize; ++iPlotter) {

@@ -30,6 +30,8 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+#include "DataFormats/JetReco/interface/GenJet.h" //genJets
+
 #include <string>
 #include <vector>
 #include <map>
@@ -69,9 +71,11 @@ typedef std::map<edm::RefToBase<reco::Jet>, unsigned int, JetRefCompare> Flavour
 typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCompare> LeptonMap;
   //  reco::JetFlavour getJetFlavour(
   //	edm::RefToBase<reco::Jet> caloRef, FlavourMap flavours);
+  bool getJetWithGenJet(reco::Jet jet, edm::Handle<std::vector<reco::GenJet>> genJetcol); //genJets 
   bool getJetWithFlavour( edm::RefToBase<reco::Jet> caloRef,
                          FlavourMap flavours, JetWithFlavour &jetWithFlavour,
-                         const edm::EventSetup & es);
+			  const edm::EventSetup & es,
+			  edm::Handle<std::vector<reco::GenJet>> genJetcol);
 
   std::vector<std::string> tiDataFormatType;
   bool partonKinematics;
@@ -88,6 +92,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
 
   edm::InputTag jetMCSrc;
   edm::InputTag slInfoTag;
+  edm::InputTag genJetsSrc; //genJets
 
   std::vector< std::vector<JetTagPlotter*> > binJetTagPlotters;
   std::vector< std::vector<TagCorrelationPlotter*> > binTagCorrelationPlotters;
@@ -107,6 +112,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
 
   CorrectJet jetCorrector;
   MatchJet jetMatcher;
+  bool useGenJets; //genJets
 
   bool eventInitialized;
   bool electronPlots, muonPlots, tauPlots;

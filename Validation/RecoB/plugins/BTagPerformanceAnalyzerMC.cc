@@ -502,7 +502,7 @@ bool BTagPerformanceAnalyzerMC::getJetWithGenJet(reco::Jet jet, edm::Handle<vect
     //std::cout<<"in the genjet loop"<<ptrel<<" "<<dr<<std::endl;                                                                                                                                          
     if (dr<0.4 && ptrel<3.0) return true;
   }
-  std::cout<<" not pass"<<std::endl;
+  //std::cout<<" not pass"<<std::endl;
   return false;
 }
 
@@ -539,7 +539,7 @@ bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<Jet> jetRef, 
 
   jetWithFlavour.first = jetCorrector(*jetRef);
 
-  int fl = -100;
+  int fl = 20; //PU
   if(getJetWithGenJet(jetWithFlavour.first, genJetcol)) fl=flavours[jetRef]; 
   //jetWithFlavour.second = reco::JetFlavour(jetWithFlavour.first.p4(), math::XYZPoint (0,0,0), flavours[jetRef]);
   jetWithFlavour.second = reco::JetFlavour(jetWithFlavour.first.p4(), math::XYZPoint (0,0,0), fl);

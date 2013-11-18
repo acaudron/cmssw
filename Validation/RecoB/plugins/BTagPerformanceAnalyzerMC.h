@@ -18,8 +18,7 @@
 #include "DQMOffline/RecoB/interface/TagCorrelationPlotter.h"
 #include "DQMOffline/RecoB/interface/BaseTagInfoPlotter.h"
 #include "DQMOffline/RecoB/interface/Tools.h"
-//#include "RecoBTag/MCTools/interface/JetFlavourIdentifier.h"
-//#include "RecoBTag/MCTools/interface/JetFlavour.h"
+
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
@@ -29,14 +28,11 @@
 #include "DQMOffline/RecoB/interface/MatchJet.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
-#include "DataFormats/JetReco/interface/GenJet.h" //genJets
+#include "DataFormats/JetReco/interface/GenJet.h"
 
 #include <string>
 #include <vector>
 #include <map>
-
-//class CaloJetRef;
 
 /** \class BTagPerformanceAnalyzerMC
  *
@@ -92,7 +88,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
 
   edm::InputTag jetMCSrc;
   edm::InputTag slInfoTag;
-  edm::InputTag genJetsSrc; //genJets
+  edm::InputTag genJetsSrc; 
 
   std::vector< std::vector<JetTagPlotter*> > binJetTagPlotters;
   std::vector< std::vector<TagCorrelationPlotter*> > binTagCorrelationPlotters;
@@ -102,7 +98,6 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
   std::vector< std::vector<edm::InputTag> > tagInfoInputTags;
   // Contains plots for each bin of rapidity and pt.
   std::vector< std::vector<BTagDifferentialPlot*> > differentialPlots;
-  //  JetFlavourIdentifier jfi;
   std::vector<edm::ParameterSet> moduleConfig;
   std::map<BaseTagInfoPlotter*, size_t> binTagInfoPlottersToModuleConfig;
 
@@ -112,7 +107,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
 
   CorrectJet jetCorrector;
   MatchJet jetMatcher;
-  bool useGenJets; //genJets
+  bool useGenJets;
 
   bool eventInitialized;
   bool electronPlots, muonPlots, tauPlots;

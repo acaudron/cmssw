@@ -91,8 +91,7 @@ if runOnMC:
     process.bTagValidation.flavPlots = "allbcldusg" #if contains "noall" plots for all jets not booked, if contains "dusg" all histograms booked, default : all, b, c, udsg, ni
     process.bTagValidation.genJets = cms.InputTag("ak5GenJets")
     process.bTagValidation.useGenJets = cms.bool(True)
-    process.bTagValidation.ptRecJetMin = cms.double(20.)
-    #process.bTagValidation.ptRecJetMin = cms.double(40.)
+    #process.bTagValidation.ptRecJetMin = cms.double(20.)
 else:
     process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 

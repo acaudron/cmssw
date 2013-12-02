@@ -29,6 +29,7 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/Common/interface/Association.h"
 
 #include <string>
 #include <vector>
@@ -63,14 +64,16 @@ class BTagPerformanceAnalyzerMC : public edm::EDAnalyzer {
   void bookHistos(const edm::ParameterSet& pSet);
   EtaPtBin getEtaPtBin(const int& iEta, const int& iPt);
     typedef std::pair<reco::Jet, reco::JetFlavour> JetWithFlavour;
-typedef std::map<edm::RefToBase<reco::Jet>, unsigned int, JetRefCompare> FlavourMap;
-typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCompare> LeptonMap;
+    typedef std::map<edm::RefToBase<reco::Jet>, unsigned int, JetRefCompare> FlavourMap;
+    typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCompare> LeptonMap;
   //  reco::JetFlavour getJetFlavour(
   //	edm::RefToBase<reco::Jet> caloRef, FlavourMap flavours);
   bool getJetWithGenJet(reco::Jet jet, edm::Handle<std::vector<reco::GenJet>> genJetcol); //genJets 
+  bool getJetWithGenJetMatched(edm::RefToBase<reco::Jet> jetRef, edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatch); //genJets
   bool getJetWithFlavour( edm::RefToBase<reco::Jet> caloRef,
                          FlavourMap flavours, JetWithFlavour &jetWithFlavour,
 			  const edm::EventSetup & es,
+			  edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatch,
 			  edm::Handle<std::vector<reco::GenJet>> genJetcol);
 
   std::vector<std::string> tiDataFormatType;
@@ -89,6 +92,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
   edm::InputTag jetMCSrc;
   edm::InputTag slInfoTag;
   edm::InputTag genJetsSrc; 
+  edm::InputTag genJetsMatchedSrc;
 
   std::vector< std::vector<JetTagPlotter*> > binJetTagPlotters;
   std::vector< std::vector<TagCorrelationPlotter*> > binTagCorrelationPlotters;
@@ -108,6 +112,7 @@ typedef std::map<edm::RefToBase<reco::Jet>, reco::JetFlavour::Leptons, JetRefCom
   CorrectJet jetCorrector;
   MatchJet jetMatcher;
   bool useGenJets;
+  bool useCmsMatching;
 
   bool eventInitialized;
   bool electronPlots, muonPlots, tauPlots;

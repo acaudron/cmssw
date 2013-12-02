@@ -90,14 +90,19 @@ if runOnMC:
     process.bTagValidation.applyPtHatWeight = False
     process.bTagValidation.flavPlots = "allbcldusg" #if contains "noall" plots for all jets not booked, if contains "dusg" all histograms booked, default : all, b, c, udsg, ni
     process.bTagValidation.genJets = cms.InputTag("ak5GenJets")
+    process.bTagValidation.genJetsMatched = cms.InputTag("patJetGenJetMatch")
     process.bTagValidation.useGenJets = cms.bool(True)
+    process.bTagValidation.useCmsMatching = cms.bool(True)
     #process.bTagValidation.ptRecJetMin = cms.double(20.)
+    process.load("PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi")
+    process.patJetGenJetMatch.src = newjetID
 else:
     process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
-)
+    input = cms.untracked.int32(1000)
+    )
+
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
@@ -108,7 +113,7 @@ else:
     process.jetSequences = cms.Sequence(process.mygoodOfflinePrimaryVertices * process.JECAlgo * process.btagSequence)
 
 if runOnMC:
-    process.dqmSeq = cms.Sequence(process.flavourSeq * process.bTagValidation * process.dqmSaver)
+    process.dqmSeq = cms.Sequence(process.patJetGenJetMatch * process.flavourSeq * process.bTagValidation * process.dqmSaver)
 else:
     process.dqmSeq = cms.Sequence(process.bTagAnalysis * process.dqmSaver)
 
@@ -126,5 +131,5 @@ process.dqmSaver.saveAtJobEnd =cms.untracked.bool(True)
 process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 process.PoolSource.fileNames = [
 
-]
+    ]
 

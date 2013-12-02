@@ -7,6 +7,7 @@
 #include "DataFormats/Common/interface/View.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+//#include "DataFormats/Common/interface/Association.h"
 
 using namespace reco;
 using namespace edm;
@@ -41,12 +42,14 @@ BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pS
   jetMCSrc(pSet.getParameter<edm::InputTag>("jetMCSrc")),
   slInfoTag(pSet.getParameter<edm::InputTag>("softLeptonInfo")),
   genJetsSrc(pSet.getParameter<edm::InputTag>("genJets")), //genJets
+  genJetsMatchedSrc(pSet.getParameter<edm::InputTag>("genJetsMatched")), //genJets
   moduleConfig(pSet.getParameter< vector<edm::ParameterSet> >("tagConfig")),
   flavPlots_(pSet.getParameter< std::string >("flavPlots")),
   makeDiffPlots_(pSet.getParameter< bool >("differentialPlots")),
   jetCorrector(pSet.getParameter<std::string>("jetCorrection")),
   jetMatcher(pSet.getParameter<edm::ParameterSet>("recJetMatching")),
-  useGenJets(pSet.getParameter< bool >("useGenJets"))
+  useGenJets(pSet.getParameter< bool >("useGenJets")),
+  useCmsMatching(pSet.getParameter< bool >("useCmsMatching"))
 {
   //mcPlots_ : 1=b+c+l+ni; 2=all+1; 3=1+d+u+s+g; 4=3+all . Default is 2. Don't use 0.
   if(flavPlots_.find("dusg")<15){
@@ -293,6 +296,8 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
 
   edm::Handle<vector<GenJet>> genJetCol;                                                                                                                     
   iEvent.getByLabel(genJetsSrc, genJetCol);                                                                                                                             
+  edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatch;
+  iEvent.getByLabel(genJetsMatchedSrc, genJetMatch);                                                                                                                             
 
   edm::Handle<JetFlavourMatchingCollection> jetMC;
   FlavourMap flavours;
@@ -330,7 +335,7 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
         continue;
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetCol))
+      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetMatch, genJetCol))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
@@ -373,7 +378,7 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
         continue;
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetCol))
+      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetMatch, genJetCol))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
@@ -461,7 +466,7 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
          continue;
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(jetRef, flavours, jetWithFlavour, iSetup, genJetCol))
+      if (!getJetWithFlavour(jetRef, flavours, jetWithFlavour, iSetup, genJetMatch, genJetCol))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getFlavour()), infoHandle))
         continue;
@@ -496,8 +501,17 @@ bool BTagPerformanceAnalyzerMC::getJetWithGenJet(reco::Jet jet, edm::Handle<vect
   return false;
 }
 
+bool BTagPerformanceAnalyzerMC::getJetWithGenJetMatched(edm::RefToBase<Jet> jetRef, edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatch)
+{
+  if(!useGenJets) return true;
+  reco::GenJetRef genjet = (*genJetMatch)[jetRef];
+  if (genjet.isNonnull() && genjet.isAvailable()) return true;
+  return false;
+}
+
 bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<Jet> jetRef, FlavourMap flavours,
-							JetWithFlavour & jetWithFlavour, const edm::EventSetup & es, edm::Handle<vector<reco::GenJet>> genJetcol)
+							JetWithFlavour & jetWithFlavour, const edm::EventSetup & es,  
+							edm::Handle<edm::Association<reco::GenJetCollection> > genJetMatch, edm::Handle<vector<reco::GenJet>> genJetcol)
 {
 
   edm::ProductID recProdId = jetRef.id();
@@ -530,7 +544,12 @@ bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(	edm::RefToBase<Jet> jetRef, 
   jetWithFlavour.first = jetCorrector(*jetRef);
 
   int fl = 20; // PU flavour
-  if(getJetWithGenJet(jetWithFlavour.first, genJetcol)) fl=flavours[jetRef]; 
+
+  bool isNotPU = getJetWithGenJet(jetWithFlavour.first, genJetcol);
+  
+  if(useCmsMatching) isNotPU = getJetWithGenJetMatched(jetRef, genJetMatch);
+  if(isNotPU) fl=flavours[jetRef];
+
   jetWithFlavour.second = reco::JetFlavour(jetWithFlavour.first.p4(), math::XYZPoint (0,0,0), fl);
 
   LogTrace("Info") << "Found jet with flavour "<<jetWithFlavour.second.getFlavour()<<endl;

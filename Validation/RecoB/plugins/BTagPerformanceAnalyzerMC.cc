@@ -492,7 +492,8 @@ bool BTagPerformanceAnalyzerMC::getJetWithGenJet(reco::Jet jet, edm::Handle<vect
   const vector<reco::GenJet> *genJets = genJetcol.product();
   for (unsigned int iGenJet = 0; iGenJet != genJets->size(); ++iGenJet) {
     reco::GenJet genJet = genJets->at(iGenJet);
-    double ptrel = fabs(jet.pt()-genJet.pt())/jet.pt();
+    double ptrel = fabs(jet.pt()-genJet.pt())/genJet.pt();
+    //double ptrel = fabs(jet.pt()-genJet.pt())/jet.pt();
     double deta = jet.eta() - genJet.eta();
     double dphi = fabs(jet.phi()-genJet.phi()); if (dphi>double(M_PI)) dphi-=double(2*M_PI);
     double dr =  sqrt(deta*deta + dphi*dphi);

@@ -65,11 +65,11 @@ if whichJets=="ak5PFnoPU":
     newjetID=cms.InputTag("selectedPatJetsPF2PAT")
 elif whichJets=="ak5PFJEC" or whichJets=="ak5PFJECL1":
     if whichJets=="ak5PFJECL1":
-        if not runOnMC : process.ak5PFJetsJEC.correctors = ['ak5PFL1FastL2L3Residual']
-        else : process.ak5PFJetsJEC.correctors = ['ak5PFL1FastL2L3']
-        process.PFJetsFilter.src = cms.InputTag("ak5PFJetsJEC")
-    process.JECAlgo = cms.Sequence(process.ak5PFJetsJEC * process.PFJetsFilter)
-    newjetID=cms.InputTag("PFJetsFilter")
+        if not runOnMC : process.ak5PFchsJetsJEC.correctors = ['ak5PFchsL1FastL2L3Residual']
+        else : process.ak5PFchsJetsJEC.correctors = ['ak5PFchsL1FastL2L3']
+        process.PFJetsFilter.src = cms.InputTag("ak5PFchsJetsJEC")
+    process.JECAlgo = cms.Sequence(process.ak5PFchsJetsJEC * process.PFchsJetsFilter)
+    newjetID=cms.InputTag("PFchsJetsFilter")
 
     
 if not whichJets=="ak5PF":
@@ -93,14 +93,16 @@ if runOnMC:
     process.bTagValidation.genJetsMatched = cms.InputTag("patJetGenJetMatch")
     process.bTagValidation.useGenJets = cms.bool(True)
     process.bTagValidation.useCmsMatching = cms.bool(True)
-    #process.bTagValidation.ptRecJetMin = cms.double(20.)
+    #process.bTagValidation.useCmsMatching = cms.bool(False)
+    process.bTagValidation.ptRecJetMin = cms.double(20.)
     process.load("PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi")
     process.patJetGenJetMatch.src = newjetID
+    process.patJetGenJetMatch.resolveAmbiguities = cms.bool(True)
 else:
     process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
     )
 
 process.source = cms.Source("PoolSource",

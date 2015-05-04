@@ -4,7 +4,7 @@ import FWCore.ParameterSet.Config as cms
 #from JetMETCorrections.Configuration.JetCorrectionServices_cff import ak4PFL2L3,ak4PFL2Relative,ak4PFL3Absolute
 
 #JEC for CHS
-from JetMETCorrections.Configuration.JetCorrectors_cff import *
+#from JetMETCorrections.Configuration.JetCorrectors_cff import *
 
 ######### DATA ############
 from DQMOffline.RecoB.bTagAnalysisData_cfi import *
@@ -12,7 +12,8 @@ bTagAnalysis.ptRanges = cms.vdouble(0.0)
 bTagAnalysis.doJetID = True
 bTagAnalysis.doJEC = True
 #Residual correction will be added inside the c++ code only for data (checking the presence of genParticles collection), not explicit here as this sequence also ran on MC FullSim
-bTagPlotsDATA = cms.Sequence(ak4PFCHSL1FastL2L3CorrectorChain*ak4PFCHSL1FastL2L3ResidualCorrector*bTagAnalysis)
+#bTagPlotsDATA = cms.Sequence(ak4PFCHSL1FastL2L3CorrectorChain*ak4PFCHSL1FastL2L3ResidualCorrector*bTagAnalysis)
+bTagPlotsDATA = cms.Sequence(bTagAnalysis)
 
 ########## MC ############
 #Matching
@@ -44,7 +45,8 @@ bTagValidation.doJetID = True
 bTagValidation.doJEC = True
 bTagValidation.genJetsMatched = cms.InputTag("newpatJetGenJetMatch")
 #to run on fastsim
-prebTagSequenceMC = cms.Sequence(ak4GenJetsForPUid*newpatJetGenJetMatch*selectedHadronsAndPartons*myak4JetFlavourInfos*ak4PFCHSL1FastL2L3CorrectorChain)
+#prebTagSequenceMC = cms.Sequence(ak4GenJetsForPUid*newpatJetGenJetMatch*selectedHadronsAndPartons*myak4JetFlavourInfos*ak4PFCHSL1FastL2L3CorrectorChain)
+prebTagSequenceMC = cms.Sequence(ak4GenJetsForPUid*newpatJetGenJetMatch*selectedHadronsAndPartons*myak4JetFlavourInfos)
 bTagPlotsMC = cms.Sequence(bTagValidation)
 
 #to run on fullsim in the validation sequence, all histograms produced in the dqmoffline sequence

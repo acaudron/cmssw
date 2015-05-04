@@ -23,12 +23,10 @@ BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pS
   etaRanges(pSet.getParameter< vector<double> >("etaRanges")),
   ptRanges(pSet.getParameter< vector<double> >("ptRanges")),
   useOldFlavourTool(pSet.getParameter<bool>( "useOldFlavourTool" )),
-  JECsource(pSet.getParameter<std::string>( "JECsource" )),
   doJEC(pSet.getParameter<bool>( "doJEC" )),
   ptHatWeight(pSet.getParameter< bool >("applyPtHatWeight")),
   moduleConfig(pSet.getParameter< vector<edm::ParameterSet> >("tagConfig")),
   flavPlots_(pSet.getParameter< std::string >("flavPlots")),
-  jetCorrector(pSet.getParameter<std::string>("jetCorrection")),
   jetMatcher(pSet.getParameter<edm::ParameterSet>("recJetMatching")),
   doPUid(pSet.getParameter< bool >("doPUid"))
 {
@@ -55,6 +53,8 @@ BTagPerformanceAnalyzerMC::BTagPerformanceAnalyzerMC(const edm::ParameterSet& pS
   jetToken = consumes<JetFlavourInfoMatchingCollection>(pSet.getParameter<InputTag>("jetMCSrc"));
   caloJetToken = mayConsume<JetFlavourMatchingCollection>(pSet.getParameter<InputTag>("caloJetMCSrc"));
   slInfoToken = consumes<SoftLeptonTagInfoCollection>(pSet.getParameter<InputTag>("softLeptonInfo"));
+  jecMCToken = consumes<JetCorrector>(pSet.getParameter<edm::InputTag>( "JECsourceMC" ));
+  jecDataToken = mayConsume<JetCorrector>(pSet.getParameter<edm::InputTag>( "JECsourceData" ));
   for (vector<edm::ParameterSet>::const_iterator iModule = moduleConfig.begin();
        iModule != moduleConfig.end(); ++iModule) {
 
@@ -291,9 +291,10 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
   if(doJEC) {
     edm::Handle<GenEventInfoProduct> genInfoHandle; //check if data or MC
     iEvent.getByToken(genToken, genInfoHandle);
-    std::string allJECsource = JECsource;
-    if( !genInfoHandle.isValid() ) allJECsource += "Residual";
-    corrector = JetCorrector::getJetCorrector (allJECsource,iSetup);   //Get the jet corrector from the event setup
+    edm::Handle<JetCorrector> corrHandle;
+    if( !genInfoHandle.isValid() ) iEvent.getByToken( jecDataToken, corrHandle);
+    else iEvent.getByToken( jecMCToken, corrHandle);
+    corrector = corrHandle.product();
   }
   //
 
@@ -319,11 +320,11 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
       reco::Jet correctedJet = *(tagI->first);
       double jec = 1.0;
       if(doJEC && corrector) {
-        jec = corrector->correction(*(tagI->first),iEvent,iSetup);
+        jec = corrector->correction(*(tagI->first));
       }
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetsMatched))
+      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, corrector, genJetsMatched))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getPartonFlavour()), infoHandle, jec))
         continue;
@@ -365,11 +366,11 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
       reco::Jet correctedJet = *(tagI->first);
       double jec = 1.0;
       if(doJEC && corrector) {
-        jec = corrector->correction(*(tagI->first),iEvent,iSetup);
+        jec = corrector->correction(*(tagI->first));
       }
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, iSetup, genJetsMatched))
+      if (!getJetWithFlavour(tagI->first, flavours, jetWithFlavour, corrector, genJetsMatched))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getPartonFlavour()), infoHandle, jec))
         continue;
@@ -457,11 +458,11 @@ void BTagPerformanceAnalyzerMC::analyze(const edm::Event& iEvent, const edm::Eve
       reco::Jet correctedJet = *(jetRef);
       double jec = 1.0;
       if(doJEC && corrector) {
-        jec = corrector->correction(*(jetRef),iEvent,iSetup);
+        jec = corrector->correction(*(jetRef));
       }
 
       JetWithFlavour jetWithFlavour;
-      if (!getJetWithFlavour(jetRef, flavours, jetWithFlavour, iSetup, genJetsMatched))
+      if (!getJetWithFlavour(jetRef, flavours, jetWithFlavour, corrector, genJetsMatched))
         continue;
       if (!jetSelector(jetWithFlavour.first, std::abs(jetWithFlavour.second.getPartonFlavour()), infoHandle, jec))
         continue;
@@ -486,7 +487,7 @@ bool BTagPerformanceAnalyzerMC::getJetWithGenJet(edm::RefToBase<Jet> jetRef, edm
 }
 
 bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(edm::RefToBase<Jet> jetRef, const FlavourMap& flavours,
-						   JetWithFlavour & jetWithFlavour, const edm::EventSetup & es, 
+						   JetWithFlavour & jetWithFlavour, const JetCorrector * corrector, 
 						   edm::Handle<edm::Association<reco::GenJetCollection> > genJetsMatched)
 {
   edm::ProductID recProdId = jetRef.id();
@@ -495,7 +496,7 @@ bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(edm::RefToBase<Jet> jetRef, c
     : flavours.begin()->first.id();
 
   if (!eventInitialized) {
-    jetCorrector.setEventSetup(es);
+    jetCorrector.setCorrector(corrector);
     if (recProdId != refProdId) {
       edm::RefToBaseVector<Jet> refJets;
       for(FlavourMap::const_iterator iter = flavours.begin();
@@ -505,7 +506,7 @@ bool  BTagPerformanceAnalyzerMC::getJetWithFlavour(edm::RefToBase<Jet> jetRef, c
       edm::RefToBaseVector<Jet> recJets;
       for(unsigned int i = 0; i < recJetsProd->size(); i++)
         recJets.push_back(edm::RefToBase<Jet>(recJetsProd, i));
-      jetMatcher.matchCollections(refJets, recJets, es);
+      jetMatcher.matchCollections(refJets, recJets, corrector);
     }
     eventInitialized = true;
   }

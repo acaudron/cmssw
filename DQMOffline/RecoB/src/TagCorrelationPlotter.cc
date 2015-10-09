@@ -8,14 +8,16 @@ using namespace RecoBTag;
 
 TagCorrelationPlotter::TagCorrelationPlotter(const std::string& tagName1, const std::string& tagName2,
                                              const EtaPtBin& etaPtBin, const edm::ParameterSet& pSet,
-                                             const unsigned int& mc, DQMStore::IBooker & ibook) :
+                                             const unsigned int& mc, const bool finalize, DQMStore::IBooker & ibook) :
                                              BaseBTagPlotter(tagName2 + "_vs_" + tagName1, etaPtBin),
   					     lowerBound1_(pSet.getParameter<double>("Discr1Start")),
   					     lowerBound2_(pSet.getParameter<double>("Discr2Start")),
   					     upperBound1_(pSet.getParameter<double>("Discr1End")),
   					     upperBound2_(pSet.getParameter<double>("Discr2End")),
-                                             createProfile_(pSet.getParameter<bool>("CreateProfile"))
+                                             createProfile_(pSet.getParameter<bool>("CreateProfile")),
+					     finalize_(finalize)
   {
+  if(finalize_) return;  
   correlationHisto_ = new FlavourHistograms2D<double, double>("correlation" + theExtensionString, tagName2 + " discr vs " + tagName1 + " discr",
                                                               50, lowerBound1_, upperBound1_, 50, lowerBound2_, upperBound2_, false, 
                                                               "TagCorrelation" + theExtensionString, mc, createProfile_, ibook);
@@ -23,6 +25,7 @@ TagCorrelationPlotter::TagCorrelationPlotter(const std::string& tagName1, const 
 }
 
 TagCorrelationPlotter::~TagCorrelationPlotter() {
+  if(finalize_) return;
   delete correlationHisto_;
 }
 

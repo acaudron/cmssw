@@ -119,7 +119,7 @@ void BTagPerformanceAnalyzerOnData::bookHistograms(DQMStore::IBooker & ibook, ed
             // Instantiate the generic b tag correlation plotter
             TagCorrelationPlotter* tagCorrelationPlotter = new TagCorrelationPlotter(label1.label(), label2.label(), etaPtBin,
                                                                                      iModule->getParameter<edm::ParameterSet>("parameters"),
-                                                                                     0, ibook);
+                                                                                     0, false, ibook);
             binTagCorrelationPlotters.at(iTagCorr).push_back(tagCorrelationPlotter);
           }
         }

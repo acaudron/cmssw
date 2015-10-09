@@ -11,7 +11,7 @@
 class TagCorrelationPlotter : public BaseBTagPlotter {
   public:
     TagCorrelationPlotter(const std::string& tagName1, const std::string& tagName2, const EtaPtBin& etaPtBin,
-                          const edm::ParameterSet& pSet, const unsigned int& mc , DQMStore::IBooker & ibook);
+                          const edm::ParameterSet& pSet, const unsigned int& mc, const bool finalize, DQMStore::IBooker & ibook);
 
     virtual ~TagCorrelationPlotter();
 
@@ -29,6 +29,7 @@ class TagCorrelationPlotter : public BaseBTagPlotter {
     double lowerBound1_, lowerBound2_;
     double upperBound1_, upperBound2_;
     bool createProfile_;
+    bool finalize_;
 
     FlavourHistograms2D<double, double>* correlationHisto_;
 };

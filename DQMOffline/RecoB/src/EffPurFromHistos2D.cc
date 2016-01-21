@@ -1,4 +1,4 @@
-#include "DQMOffline/RecoB/interface/EffPurFromHistos.h"
+#include "DQMOffline/RecoB/interface/EffPurFromHistos2D.h"
 #include "DQMOffline/RecoB/interface/Tools.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "TStyle.h"
@@ -14,43 +14,45 @@
 using namespace std;
 using namespace RecoBTag;
 
-EffPurFromHistos::EffPurFromHistos ( const std::string & ext, TH1F * h_d, TH1F * h_u,
-				     TH1F * h_s, TH1F * h_c, TH1F * h_b, TH1F * h_g, TH1F * h_ni,
-				     TH1F * h_dus, TH1F * h_dusg, TH1F * h_pu, 
+EffPurFromHistos2D::EffPurFromHistos2D ( const std::string & ext, TH2F * h_d, TH2F * h_u,
+                                     TH2F * h_s, TH2F * h_c, TH2F * h_b, TH2F * h_g, TH2F * h_ni,
+                                     TH2F * h_dus, TH2F * h_dusg, TH2F * h_pu,
 				     const std::string& label, const unsigned int& mc, 
-				     int nBin, double startO, double endO) :
+				     int nBinX, double startOX, double endOX, int nBinY, double startOY, double endOY) :
         fromDiscriminatorDistr(false),
 	histoExtension(ext), effVersusDiscr_d(h_d), effVersusDiscr_u(h_u),
-	effVersusDiscr_s(h_s), effVersusDiscr_c(h_c), effVersusDiscr_b(h_b),
-	effVersusDiscr_g(h_g), effVersusDiscr_ni(h_ni), effVersusDiscr_dus(h_dus),
-	effVersusDiscr_dusg(h_dusg), effVersusDiscr_pu(h_pu), 
-	nBinOutput(nBin), startOutput(startO),
-	endOutput(endO),  mcPlots_(mc), doCTagPlots_(false), label_(label)
+        effVersusDiscr_s(h_s), effVersusDiscr_c(h_c), effVersusDiscr_b(h_b),
+        effVersusDiscr_g(h_g), effVersusDiscr_ni(h_ni), effVersusDiscr_dus(h_dus),
+        effVersusDiscr_dusg(h_dusg), effVersusDiscr_pu(h_pu),
+	nBinOutputX(nBinX), startOutputX(startOX), endOutputX(endOX), nBinOutputY(nBinY), startOutputY(startOY), endOutputY(endOY),  
+        mcPlots_(mc), doCTagPlots_(false), label_(label)
 {
   // consistency check
   check();
 }
 
-EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscriminatorFC, const std::string& label, 
-				    const unsigned int& mc, DQMStore::IBooker & ibook, int nBin,
-				    double startO, double endO) :
-	  fromDiscriminatorDistr(true), nBinOutput(nBin), startOutput(startO), endOutput(endO),  mcPlots_(mc), doCTagPlots_(false), label_(label){
+EffPurFromHistos2D::EffPurFromHistos2D (const FlavourHistograms2D<double, double> * dDiscriminatorFC, 
+				    const std::string& label, const unsigned int& mc, 
+                                    DQMStore::IBooker & ibook, 
+                                    int nBinX, double startOX, double endOX, int nBinY, double startOY, double endOY) :
+	  fromDiscriminatorDistr(true), nBinOutputX(nBinX), startOutputX(startOX), endOutputX(endOX), nBinOutputY(nBinY), startOutputY(startOY), endOutputY(endOY), mcPlots_(mc), doCTagPlots_(false), label_(label){
   histoExtension = "_"+dDiscriminatorFC->baseNameTitle();
 
-
-  discrNoCutEffic = new FlavourHistograms<double> (
-	"totalEntries" + histoExtension, "Total Entries: " + dDiscriminatorFC->baseNameDescription(),
-	dDiscriminatorFC->nBins(), dDiscriminatorFC->lowerBound(),
-	dDiscriminatorFC->upperBound(), false, true, false, "b", label, mcPlots_, ibook );
-
+  discrNoCutEffic = new FlavourHistograms2D<double, double> (
+        "totalEntries" + histoExtension, "Total Entries: " + dDiscriminatorFC->baseNameDescription(),
+        dDiscriminatorFC->nBinsX(), dDiscriminatorFC->lowerBoundX(), dDiscriminatorFC->upperBoundX(), dDiscriminatorFC->nBinsY(), 
+        dDiscriminatorFC->lowerBoundY(), dDiscriminatorFC->upperBoundY(), 
+        false, label, mcPlots_, false, ibook);
   // conditional discriminator cut for efficiency histos
 
-  discrCutEfficScan = new FlavourHistograms<double> (
+  discrCutEfficScan = new FlavourHistograms2D<double, double> (
 	"effVsDiscrCut" + histoExtension, "Eff. vs Disc. Cut: " + dDiscriminatorFC->baseNameDescription(),
-	dDiscriminatorFC->nBins(), dDiscriminatorFC->lowerBound(),
-	dDiscriminatorFC->upperBound(), false, true, false, "b", label , mcPlots_, ibook );
+	dDiscriminatorFC->nBinsX(), dDiscriminatorFC->lowerBoundX(), dDiscriminatorFC->upperBoundX(), dDiscriminatorFC->nBinsY(),
+        dDiscriminatorFC->lowerBoundY(), dDiscriminatorFC->upperBoundY(),
+        false, label, mcPlots_, false, ibook);
   discrCutEfficScan->SetMinimum(1E-4);
-  if (mcPlots_){ 
+
+  if (mcPlots_){
 
     if(mcPlots_>2){
       effVersusDiscr_d =    discrCutEfficScan->histo_d   ();
@@ -61,7 +63,7 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
     }
     else{
       effVersusDiscr_d   =  0;
-      effVersusDiscr_u   =  0; 
+      effVersusDiscr_u   =  0;
       effVersusDiscr_s   =  0;
       effVersusDiscr_g   =  0;
       effVersusDiscr_dus =  0;
@@ -72,7 +74,7 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
     effVersusDiscr_dusg = discrCutEfficScan->histo_dusg();
     effVersusDiscr_pu = discrCutEfficScan->histo_pu();
 
-  
+
     if(mcPlots_>2){
       effVersusDiscr_d->SetXTitle ( "Discriminant" );
       effVersusDiscr_d->GetXaxis()->SetTitleOffset ( 0.75 );
@@ -98,9 +100,9 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
   }
   else{
     effVersusDiscr_d =    0;
-    effVersusDiscr_u =    0; 
+    effVersusDiscr_u =    0;
     effVersusDiscr_s =    0;
-    effVersusDiscr_c =    0; 
+    effVersusDiscr_c =    0;
     effVersusDiscr_b =    0;
     effVersusDiscr_g =    0;
     effVersusDiscr_ni =   0;
@@ -110,13 +112,11 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
   }
 
   // discr. for computation
-  vector<TH1F*> discrCfHistos = dDiscriminatorFC->getHistoVector();
-
+  vector<TH2F*> discrCfHistos = dDiscriminatorFC->getHistoVector();
   // discr no cut
-  vector<TH1F*> discrNoCutHistos = discrNoCutEffic->getHistoVector();
-
+  vector<TH2F*> discrNoCutHistos = discrNoCutEffic->getHistoVector();
   // discr no cut
-  vector<TH1F*> discrCutHistos = discrCutEfficScan->getHistoVector();
+  vector<TH2F*> discrCutHistos = discrCutEfficScan->getHistoVector();
 
   const int& dimHistos = discrCfHistos.size(); // they all have the same size
 
@@ -124,7 +124,8 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
   // fill the histos for eff-pur computations by scanning the discriminatorFC histogram
 
   // better to loop over bins -> discrCut no longer needed
-  const int& nBins = dDiscriminatorFC->nBins();
+  const int& nBinsX = dDiscriminatorFC->nBinsX();
+  const int& nBinsY = dDiscriminatorFC->nBinsY();
 
   // loop over flavours
   for ( int iFlav = 0; iFlav < dimHistos; iFlav++ ) {
@@ -135,26 +136,28 @@ EffPurFromHistos::EffPurFromHistos (const FlavourHistograms<double> * dDiscrimin
     // In Root histos, bin counting starts at 1 to nBins.
     // bin 0 is the underflow, and nBins+1 is the overflow.
     const double& nJetsFlav = discrCfHistos[iFlav]->GetEntries ();
-    double sum = discrCfHistos[iFlav]->GetBinContent( nBins+1 ); //+1 to get the overflow.
-    
-    for ( int iDiscr = nBins; iDiscr > 0 ; --iDiscr ) {
+    //double sumX = discrCfHistos[iFlav]->GetBinContent( nBinsX+1 ); //+1 to get the overflow.
+    double sum = discrCfHistos[iFlav]->GetBinContent( nBinsX+1,nBinsY+1 );    
+
+    for ( int iDiscrX = nBinsX; iDiscrX > 0 ; --iDiscrX ) {
+	for ( int iDiscrY = nBinsY; iDiscrY > 0 ; --iDiscrY ) {
       // fill all jets into NoCut histo
-      discrNoCutHistos[iFlav]->SetBinContent ( iDiscr, nJetsFlav );
-      discrNoCutHistos[iFlav]->SetBinError   ( iDiscr, sqrt(nJetsFlav) );
-      sum += discrCfHistos[iFlav]->GetBinContent( iDiscr );
-      discrCutHistos[iFlav]->SetBinContent ( iDiscr, sum );
-      discrCutHistos[iFlav]->SetBinError   ( iDiscr, sqrt(sum) );
+      discrNoCutHistos[iFlav]->SetBinContent ( iDiscrX, iDiscrY, nJetsFlav );
+      discrNoCutHistos[iFlav]->SetBinError   ( iDiscrX, iDiscrY, sqrt(nJetsFlav) );
+      sum += discrCfHistos[iFlav]->GetBinContent( iDiscrX, iDiscrY );
+      discrCutHistos[iFlav]->SetBinContent ( iDiscrX, iDiscrY, sum );
+      discrCutHistos[iFlav]->SetBinError   ( iDiscrX, iDiscrY, sqrt(sum) );
+	}
     }
   }
 
-
   // divide to get efficiency vs. discriminator cut from absolute numbers
   discrCutEfficScan->divide ( *discrNoCutEffic );  // does: histos including discriminator cut / flat histo
-  discrCutEfficScan->setEfficiencyFlag();
+  //discrCutEfficScan->setEfficiencyFlag();
 }
 
 
-EffPurFromHistos::~EffPurFromHistos () {
+EffPurFromHistos2D::~EffPurFromHistos2D () {
   /*  delete EffFlavVsBEff_d   ;
   delete EffFlavVsBEff_u   ;
   delete EffFlavVsBEff_s   ;
@@ -173,7 +176,7 @@ EffPurFromHistos::~EffPurFromHistos () {
 
 
 
-void EffPurFromHistos::epsPlot(const std::string & name)
+void EffPurFromHistos2D::epsPlot(const std::string & name)
 {
   if ( fromDiscriminatorDistr) {
     discrNoCutEffic->epsPlot(name);
@@ -182,12 +185,12 @@ void EffPurFromHistos::epsPlot(const std::string & name)
   plot(name, ".eps");
 }
 
-void EffPurFromHistos::psPlot(const std::string & name)
+void EffPurFromHistos2D::psPlot(const std::string & name)
 {
   plot(name, ".ps");
 }
 
-void EffPurFromHistos::plot(const std::string & name, const std::string & ext)
+void EffPurFromHistos2D::plot(const std::string & name, const std::string & ext)
 {
    std::string hX = "";
 	 std::string Title = "";
@@ -205,12 +208,13 @@ void EffPurFromHistos::plot(const std::string & name, const std::string & ext)
    tc.Print((name + hX + histoExtension + ext).c_str());
 }
 
-void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
+void EffPurFromHistos2D::plot (TPad * plotCanvas /* = 0 */) {
 
 //fixme:
+/*
   bool btppNI = false;
   bool btppColour = true;
-
+*/
 //   if ( !btppTitle ) gStyle->SetOptTitle ( 0 );
   setTDRStyle()->cd();
 
@@ -222,7 +226,7 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
   gPad->SetLogy  ( 1 );
   gPad->SetGridx ( 1 );
   gPad->SetGridy ( 1 );
-
+/*
   int col_c  ;
   int col_g  ;
   int col_dus;
@@ -232,10 +236,10 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
   int mStyle_g  ;
   int mStyle_dus;
   int mStyle_ni ;
-
+*/
   // marker size (same for all)
-  float mSize = gPad->GetWh() * gPad->GetHNDC() / 500.; //1.2;
-
+  //float mSize = gPad->GetWh() * gPad->GetHNDC() / 500.; //1.2;
+/*
   if ( btppColour ) {
     col_c    = 6;
     col_g    = 3; // g in green
@@ -256,7 +260,7 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
     mStyle_dus = 20;
     mStyle_ni  = 27;
   }
-  
+ 
   TString Title = "";
   if(!doCTagPlots_){
         Title = "b";
@@ -264,7 +268,7 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
   else{
         Title = "c";
   } 
- 
+
   // for the moment: plot c,dus,g
   if(mcPlots_>2){
     EffFlavVsXEff_dus ->getTH1F()->GetXaxis()->SetTitle ( Title + "-jet efficiency" );
@@ -286,6 +290,7 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
     EffFlavVsXEff_g   ->getTH1F()->SetStats     ( false );
     EffFlavVsXEff_g   ->getTH1F()->Draw("peSame");
   }
+
   EffFlavVsXEff_c   ->getTH1F()->SetMarkerColor ( col_c );
   EffFlavVsXEff_c   ->getTH1F()->SetLineColor   ( col_c );
   EffFlavVsXEff_c   ->getTH1F()->SetMarkerSize  ( mSize );
@@ -305,6 +310,8 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
   EffFlavVsXEff_ni ->getTH1F()-> SetMinimum(0.01);
   EffFlavVsXEff_dusg ->getTH1F()-> SetMinimum(0.01);
   EffFlavVsXEff_pu ->getTH1F()-> SetMinimum(0.01);
+*/
+  DUSG_reject_vs_B_reject_at_cEff->getTH2F()-> SetMinimum(0.01);
 
   // plot separately u,d and s
 //  EffFlavVsXEff_d ->GetXaxis()->SetTitle ( Title + "-jet efficiency" );
@@ -332,7 +339,7 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
 //  EffFlavVsXEff_s   ->SetMarkerStyle ( mStyle_c );
 //  EffFlavVsXEff_s   ->SetStats     ( false );
 //  EffFlavVsXEff_s   ->Draw("peSame");
-
+/*
   // only if asked: NI
   if ( btppNI ) {
     EffFlavVsXEff_ni   ->getTH1F()->SetMarkerColor ( col_ni );
@@ -342,12 +349,12 @@ void EffPurFromHistos::plot (TPad * plotCanvas /* = 0 */) {
     EffFlavVsXEff_ni   ->getTH1F()->SetStats     ( false );
     EffFlavVsXEff_ni   ->getTH1F()->Draw("peSame");
   }
+*/
 }
 
 
-void EffPurFromHistos::check () {
+void EffPurFromHistos2D::check () {
   // number of bins
-
   int nBins_d    = 0;
   int nBins_u    = 0;
   int nBins_s    = 0;
@@ -384,7 +391,6 @@ void EffPurFromHistos::check () {
     throw cms::Exception("Configuration")
       << "Input histograms do not all have the same number of bins!\n";
   }
-
 
   // start
   float sBin_d    = 0;
@@ -423,8 +429,7 @@ void EffPurFromHistos::check () {
     throw cms::Exception("Configuration")
       << "EffPurFromHistos::check() : Input histograms do not all have the same start bin!\n";
   }
-
-
+  
   // end
   float eBin_d    = 0;
   float eBin_u    = 0;
@@ -461,134 +466,71 @@ void EffPurFromHistos::check () {
   if ( !lEBin ) {
     throw cms::Exception("Configuration")
       << "EffPurFromHistos::check() : Input histograms do not all have the same end bin!\n";
-  }
+  } 
 }
 
-
-void EffPurFromHistos::compute (DQMStore::IBooker & ibook)
+void EffPurFromHistos2D::compute (DQMStore::IBooker & ibook)
 {
-  if (!mcPlots_) {
 
-    EffFlavVsXEff_d = 0;
-    EffFlavVsXEff_u = 0; 
-    EffFlavVsXEff_s = 0; 
-    EffFlavVsXEff_c = 0; 
-    EffFlavVsXEff_b = 0; 
-    EffFlavVsXEff_g = 0; 
-    EffFlavVsXEff_ni = 0; 
-    EffFlavVsXEff_dus = 0; 
-    EffFlavVsXEff_dusg = 0; 
-    EffFlavVsXEff_pu = 0; 
+  if (!mcPlots_) {
+    DUSG_reject_vs_B_reject_at_cEff =0;
     return; 
  
   }
 
   // to have shorter names ......
   const std::string & hE = histoExtension;
-  std::string hX = "";
-	TString Title = "";
-	if(!doCTagPlots_){
-	   hX = "FlavEffVsBEff_";
-		 Title = "b";
-	}
-  else{
-     hX = "FlavEffVsCEff_";
-		 Title = "c";
-  }
+  const std::string & hX = "DUSG_reject_vs_B_reject_at_cEff_";
 	
   // create histograms from base name and extension as given from user
   // BINNING MUST BE IDENTICAL FOR ALL OF THEM!!
   HistoProviderDQM prov("Btag",label_,ibook);
-  if(mcPlots_>2){
-    EffFlavVsXEff_d    = (prov.book1D ( hX + "D"    + hE , hX + "D"    + hE , nBinOutput , startOutput , endOutput ));
-    EffFlavVsXEff_d->setEfficiencyFlag();
-    EffFlavVsXEff_u    = (prov.book1D ( hX + "U"    + hE , hX + "U"    + hE , nBinOutput , startOutput , endOutput )) ;
-    EffFlavVsXEff_u->setEfficiencyFlag();
-    EffFlavVsXEff_s    = (prov.book1D ( hX + "S"    + hE , hX + "S"    + hE , nBinOutput , startOutput , endOutput )) ;
-    EffFlavVsXEff_s->setEfficiencyFlag();
-    EffFlavVsXEff_g    = (prov.book1D ( hX + "G"    + hE , hX + "G"    + hE , nBinOutput , startOutput , endOutput )) ;
-    EffFlavVsXEff_g->setEfficiencyFlag();
-    EffFlavVsXEff_dus  = (prov.book1D ( hX + "DUS"  + hE , hX + "DUS"  + hE , nBinOutput , startOutput , endOutput )) ;
-    EffFlavVsXEff_dus->setEfficiencyFlag();
-  }
-  else {
-    EffFlavVsXEff_d = 0;
-    EffFlavVsXEff_u = 0;
-    EffFlavVsXEff_s = 0;
-    EffFlavVsXEff_g = 0;
-    EffFlavVsXEff_dus = 0;
-  }
-  EffFlavVsXEff_c    = (prov.book1D ( hX + "C"    + hE , hX + "C"    + hE , nBinOutput , startOutput , endOutput )) ;
-  EffFlavVsXEff_c->setEfficiencyFlag();
-  EffFlavVsXEff_b    = (prov.book1D ( hX + "B"    + hE , hX + "B"    + hE , nBinOutput , startOutput , endOutput )) ;
-  EffFlavVsXEff_b->setEfficiencyFlag();
-  EffFlavVsXEff_ni   = (prov.book1D ( hX + "NI"   + hE , hX + "NI"   + hE , nBinOutput , startOutput , endOutput )) ;
-  EffFlavVsXEff_ni->setEfficiencyFlag();
-  EffFlavVsXEff_dusg = (prov.book1D ( hX + "DUSG" + hE , hX + "DUSG" + hE , nBinOutput , startOutput , endOutput )) ;
-  EffFlavVsXEff_dusg->setEfficiencyFlag();
-  EffFlavVsXEff_pu   = (prov.book1D ( hX + "PU"   + hE , hX + "PU"   + hE , nBinOutput , startOutput , endOutput )) ;
-  EffFlavVsXEff_pu->setEfficiencyFlag();
+  DUSG_reject_vs_B_reject_at_cEff    = (prov.book2D ( hX + "0_3"    + hE , hX + "0_3"    + hE , nBinOutputX , startOutputX , endOutputX, nBinOutputY , startOutputY , endOutputY )) ;
+  DUSG_reject_vs_B_reject_at_cEff->setEfficiencyFlag();
 	
-
-  if(mcPlots_>2){
-    EffFlavVsXEff_d->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-    EffFlavVsXEff_d->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-    EffFlavVsXEff_d->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_d->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_u->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-    EffFlavVsXEff_u->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-    EffFlavVsXEff_u->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_u->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_s->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-    EffFlavVsXEff_s->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-    EffFlavVsXEff_s->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_s->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_g->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-    EffFlavVsXEff_g->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-    EffFlavVsXEff_g->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_g->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_dus->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-    EffFlavVsXEff_dus->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-    EffFlavVsXEff_dus->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-    EffFlavVsXEff_dus->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-  }
-  EffFlavVsXEff_c->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-  EffFlavVsXEff_c->getTH1F()->SetYTitle ( "c-jet efficiency" );
-  EffFlavVsXEff_c->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_c->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_b->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-  EffFlavVsXEff_b->getTH1F()->SetYTitle ( "b-jet efficiency" );
-  EffFlavVsXEff_b->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_b->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_ni->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-  EffFlavVsXEff_ni->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-  EffFlavVsXEff_ni->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_ni->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_dusg->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-  EffFlavVsXEff_dusg->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-  EffFlavVsXEff_dusg->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_dusg->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_pu->getTH1F()->SetXTitle ( Title + "-jet efficiency" );
-  EffFlavVsXEff_pu->getTH1F()->SetYTitle ( "non " + Title + "-jet efficiency" );
-  EffFlavVsXEff_pu->getTH1F()->GetXaxis()->SetTitleOffset ( 0.75 );
-  EffFlavVsXEff_pu->getTH1F()->GetYaxis()->SetTitleOffset ( 0.75 );
+  DUSG_reject_vs_B_reject_at_cEff->getTH2F()->SetXTitle ( "B Rejection" );
+  DUSG_reject_vs_B_reject_at_cEff->getTH2F()->SetYTitle ( "Light Rejection" );
+  DUSG_reject_vs_B_reject_at_cEff->getTH2F()->GetXaxis()->SetTitleOffset ( 0.75 );
+  DUSG_reject_vs_B_reject_at_cEff->getTH2F()->GetYaxis()->SetTitleOffset ( 0.75 );
 
   // loop over eff. vs. discriminator cut b-histo and look in which bin the closest entry is;
   // use fact that eff decreases monotonously
 
   // any of the histos to be created can be taken here:
-  MonitorElement * EffFlavVsXEff = EffFlavVsXEff_b;
+  MonitorElement * EffFlavVsXEff = DUSG_reject_vs_B_reject_at_cEff;
 
-  const int& nBinB = EffFlavVsXEff->getTH1F()->GetNbinsX();
+  const int& nBinX = EffFlavVsXEff->getTH2F()->GetNbinsX();
+  const int& nBinY = EffFlavVsXEff->getTH2F()->GetNbinsY();
 
-  for ( int iBinB = 1; iBinB <= nBinB; iBinB++ ) {  // loop over the bins on the x-axis of the histograms to be filled
+  //int n_c_effs = 7;
+  double Const_C_eff[7] = {0.2,0.25,0.3,0.35,0.4,0.45,0.5};
 
-    const float& effBBinWidth = EffFlavVsXEff->getTH1F()->GetBinWidth  ( iBinB );
-    const float& effBMid      = EffFlavVsXEff->getTH1F()->GetBinCenter ( iBinB ); // middle of b-efficiency bin
-    const float& effBLeft     = effBMid - 0.5*effBBinWidth;              // left edge of bin
-    const float& effBRight    = effBMid + 0.5*effBBinWidth;              // right edge of bin
+  for ( int iBinX = 1; iBinX <= nBinX; iBinX++ ) {  // loop over the bins on the x-axis of the histograms to be filled
+
+    //const float& effBinWidthX = EffFlavVsXEff->getTH2F()->GetBinWidth  ( iBinX );
+    //const float& effMidX      = EffFlavVsXEff->getTH2F()->GetBinCenter ( iBinX ); // middle of efficiency bin
+    //const float& effLeftX     = effMidX - 0.5*effBinWidthX;              // left edge of bin
+    //const float& effRightX    = effMidX + 0.5*effBinWidthX;              // right edge of bin
+
+	for ( int iBinY = 1; iBinY <= nBinY; iBinY++ ) {  // loop over the bins on the y-axis of the histograms to be filled
+
+	    //const float& effBinWidthY = EffFlavVsXEff->getTH2F()->GetBinWidth  ( iBinY );
+	    //const float& effMidY      = EffFlavVsXEff->getTH2F()->GetBinCenter ( iBinY ); // middle of efficiency bin
+	    //const float& effLeftY     = effMidY - 0.5*effBinWidthY;              // left edge of bin
+	    //const float& effRightY    = effMidY + 0.5*effBinWidthY;              // right edge of bin
+ 
     // find the corresponding bin in the efficiency versus discriminator cut histo: closest one in efficiency
-
+    int bin = DUSG_reject_vs_B_reject_at_cEff->getTH2F()->GetBin(iBinX,iBinY,0); //linearized bin number
+    cout<<"fixed eff:"<<Const_C_eff[0]<<" bin eff:"<<effVersusDiscr_c->GetBinContent(bin)<<endl;
+    cout<<"bin err:"<<effVersusDiscr_c->GetBinError(bin)<<endl;
+    
+    cout<<"abs(fixed eff. - bin eff.):"<<abs(Const_C_eff[0]-effVersusDiscr_c->GetBinContent(bin))<<" 0.05*fixed eff:"<<Const_C_eff[0]*0.05<<endl; 
+    if (abs(Const_C_eff[0]-effVersusDiscr_c->GetBinContent(bin)) > Const_C_eff[0]*0.05) continue;
+    cout<<"abs(fixed eff. - bin eff.)/bin err:"<<abs(Const_C_eff[0]-effVersusDiscr_c->GetBinContent(bin))/effVersusDiscr_c->GetBinError(bin)<<endl;
+    if (abs(Const_C_eff[0]-effVersusDiscr_c->GetBinContent(bin))/effVersusDiscr_c->GetBinError(bin)>0.5) continue;
+    cout<<"bin err:"<<effVersusDiscr_c->GetBinError(bin)<<" 0.5*bin eff:"<<0.5*effVersusDiscr_c->GetBinContent(bin)<<endl;  
+    if (effVersusDiscr_c->GetBinError(bin)>0.5*effVersusDiscr_c->GetBinContent(bin)) continue;
+    /*
     int binClosest = findBinClosestYValue ( effVersusDiscr_b , effBMid , effBLeft , effBRight );
     if(!doCTagPlots_){
     binClosest = findBinClosestYValue ( effVersusDiscr_b , effBMid , effBLeft , effBRight );
@@ -596,7 +538,7 @@ void EffPurFromHistos::compute (DQMStore::IBooker & ibook)
     else{
     binClosest = findBinClosestYValue ( effVersusDiscr_c , effBMid , effBLeft , effBRight );
     }
-
+    
     const bool&  binFound   = ( binClosest > 0 ) ;
     //
     if ( binFound ) {
@@ -630,7 +572,8 @@ void EffPurFromHistos::compute (DQMStore::IBooker & ibook)
     else {
       //cout << "Did not find right bin for b-efficiency : " << effBMid << endl;
     }
-    
+    */
+   } 
   }
 
 

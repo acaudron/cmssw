@@ -60,12 +60,12 @@ JetTagPlotter::JetTagPlotter (const std::string & tagName, const EtaPtBin & etaP
   
   // reconstructed jet transverse momentum
   dJetRecPt = new FlavourHistograms<double>
-    ("jetPt" + es, "jet pt", 350, 0.0, 350.0,
+    ("jetPt" + es, "jet pt", 300, 0.0, 3000,
      false, false, true, "b", jetTagDir, mcPlots_, ibook);
   
   // reconstructed jet eta
   dJetRecPseudoRapidity = new FlavourHistograms<double>
-    ("jetEta" + es, "jet eta", 100, -3.0, 3.0,
+    ("jetEta" + es, "jet eta", 100, -2.4, 2.4,
      false, false, true, "b", jetTagDir, mcPlots_, ibook);
   
   // reconstructed jet phi

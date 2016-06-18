@@ -56,6 +56,10 @@ class IPTagPlotter : public BaseTagInfoPlotter {
   TrackIPHistograms<double> * tkcntHistosTkPt3D[5];
   TrackIPHistograms<int> * tkcntHistosTkNHits2D[5];
   TrackIPHistograms<int> * tkcntHistosTkNHits3D[5];
+  TrackIPHistograms<int> * tkcntHistosTkNStripHits2D[5];
+  TrackIPHistograms<int> * tkcntHistosTkNStripHits3D[5];
+  TrackIPHistograms<int> * tkcntHistosTkIsFirstPixHit2D[5];
+  TrackIPHistograms<int> * tkcntHistosTkIsFirstPixHit3D[5];
   TrackIPHistograms<int> * tkcntHistosTkNPixelHits2D[5];
   TrackIPHistograms<int> * tkcntHistosTkNPixelHits3D[5];
   FlavourHistograms<int> * trkNbr3D, * trkNbr2D;
@@ -76,6 +80,8 @@ class IPTagPlotter : public BaseTagInfoPlotter {
   FlavourHistograms<int> * selectedTrackQualHisto;
   FlavourHistograms2D<double, int> * trackMultVsJetPtHisto;
   FlavourHistograms2D<double, int> * selectedTrackMultVsJetPtHisto;
+  FlavourHistograms2D<double, int> * nHitsVsEtatHisto;
+  FlavourHistograms2D<double, int> * nPixelHitsVsEtaHisto;
 } ;
 
 #include "DQMOffline/RecoB/interface/IPTagPlotter_cc.h"

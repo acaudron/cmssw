@@ -415,6 +415,88 @@ IPTagPlotter<Container, Base>::IPTagPlotter(const std::string & tagName,
        ("tkNHits4_3D" + theExtensionString, "Track NHits 3D 4.trk",
         31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
 
+  // track nHits in strip
+  tkcntHistosTkNStripHits2D[4] = new TrackIPHistograms<int>
+       ("tkNStripHits_2D" + theExtensionString, "Track NStripHits 2D",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits2D[0] = new TrackIPHistograms<int>
+       ("tkNStripHits1_2D" + theExtensionString, "Track NStripHits 2D 1.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits2D[1] = new TrackIPHistograms<int>
+       ("tkNStripHits2_2D" + theExtensionString, "Track NStripHits 2D 2.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits2D[2] = new TrackIPHistograms<int>
+       ("tkNStripHits3_2D" + theExtensionString, "Track NStripHits 2D 3.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits2D[3] = new TrackIPHistograms<int>
+       ("tkNStripHits4_2D" + theExtensionString, "Track NStripHits 2D 4.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits3D[4] = new TrackIPHistograms<int>
+       ("tkNStripHits_3D" + theExtensionString, "Track NStripHits 3D",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits3D[0] = new TrackIPHistograms<int>
+       ("tkNStripHits1_3D" + theExtensionString, "Track NStripHits 3D 1.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits3D[1] = new TrackIPHistograms<int>
+       ("tkNStripHits2_3D" + theExtensionString, "Track NStripHits 3D 2.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits3D[2] = new TrackIPHistograms<int>
+       ("tkNStripHits3_3D" + theExtensionString, "Track NStripHits 3D 3.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkNStripHits3D[3] = new TrackIPHistograms<int>
+       ("tkNStripHits4_3D" + theExtensionString, "Track NStripHits 3D 4.trk",
+        31, -0.5, 30.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  // track nHits in first pixel layer
+  tkcntHistosTkIsFirstPixHit2D[4] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit_2D" + theExtensionString, "Track IsFirstPixHit 2D",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit2D[0] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit1_2D" + theExtensionString, "Track IsFirstPixHit 2D 1.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit2D[1] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit2_2D" + theExtensionString, "Track IsFirstPixHit 2D 2.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit2D[2] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit3_2D" + theExtensionString, "Track IsFirstPixHit 2D 3.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit2D[3] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit4_2D" + theExtensionString, "Track IsFirstPixHit 2D 4.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit3D[4] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit_3D" + theExtensionString, "Track IsFirstPixHit 3D",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit3D[0] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit1_3D" + theExtensionString, "Track IsFirstPixHit 3D 1.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit3D[1] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit2_3D" + theExtensionString, "Track IsFirstPixHit 3D 2.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit3D[2] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit3_3D" + theExtensionString, "Track IsFirstPixHit 3D 3.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
+  tkcntHistosTkIsFirstPixHit3D[3] = new TrackIPHistograms<int>
+       ("tkIsFirstPixHit4_3D" + theExtensionString, "Track IsFirstPixHit 3D 4.trk",
+        3, -0.5, 2.5, false, true, true, "b",  trackIPDir, mc, makeQualityPlots_, ibook_) ;
+
   //Pixel hits
   tkcntHistosTkNPixelHits2D[4] = new TrackIPHistograms<int>
        ("tkNPixelHits_2D" + theExtensionString, "Track NPixelHits 2D",
@@ -538,6 +620,14 @@ IPTagPlotter<Container, Base>::IPTagPlotter(const std::string & tagName,
        ("selectedTrackMultVsJetPt" + theExtensionString, "Track Multiplicity vs Jet Pt for Selected Tracks Associated to Jets",
         50, 0.0, 250.0, 21, -0.5, 20.5, false, trackIPDir, mc, true, ibook_);
 
+  nHitsVsEtatHisto = new FlavourHistograms2D<double, int>
+       ("nHitsVsEtatHisto" + theExtensionString, "Hit multiplicity vs track eta",
+        50, -2.4, 2.4, 31, -0.5, 30.5, false, trackIPDir, mc, true, ibook_);
+
+  nPixelHitsVsEtaHisto = new FlavourHistograms2D<double, int>
+       ("nPixelHitsVsEtaHisto" + theExtensionString, "Pixel Hit multiplicity vs track eta",
+        50, 0.0, 250.0, 11, -0.5, 10.5, false, trackIPDir, mc, true, ibook_);
+
 }
 
 template <class Container, class Base> 
@@ -568,6 +658,8 @@ IPTagPlotter<Container, Base>::~IPTagPlotter ()
   delete selectedTrackQualHisto;
   delete trackMultVsJetPtHisto;
   delete selectedTrackMultVsJetPtHisto;
+  delete nHitsVsEtatHisto;
+  delete nPixelHitsVsEtaHisto;
 
   for(int n=0; n != 5; ++n) {
     delete tkcntHistosSig2D[n];
@@ -588,6 +680,10 @@ IPTagPlotter<Container, Base>::~IPTagPlotter ()
     delete tkcntHistosTkPt3D[n];
     delete tkcntHistosTkNHits2D[n];
     delete tkcntHistosTkNHits3D[n];  
+    delete tkcntHistosTkNStripHits2D[n];
+    delete tkcntHistosTkNStripHits3D[n];  
+    delete tkcntHistosTkIsFirstPixHit2D[n];
+    delete tkcntHistosTkIsFirstPixHit3D[n];  
     delete tkcntHistosTkNPixelHits2D[n];
     delete tkcntHistosTkNPixelHits3D[n];
     delete tkcntHistosProb2D[n];
@@ -659,6 +755,8 @@ void IPTagPlotter<Container, Base>::analyzeTag (const reco::BaseTagInfo * baseTa
     tkcntHistosTkNChiSqr2D[4]->fill(jetFlavour, trackQual, track->normalizedChi2(), true,w);
     tkcntHistosTkPt2D[4]->fill(jetFlavour, trackQual, track->pt(), true,w);
     tkcntHistosTkNHits2D[4]->fill(jetFlavour, trackQual, track->found(), true,w);
+    tkcntHistosTkNStripHits2D[4]->fill(jetFlavour, trackQual, track->found()-track->hitPattern().numberOfValidPixelHits(), true,w);
+    tkcntHistosTkIsFirstPixHit2D[4]->fill(jetFlavour, trackQual, track->hitPattern().hasValidHitInFirstPixelBarrel ()*1+track->hitPattern().hasValidHitInFirstPixelEndcap()*2*(!(track->hitPattern().hasValidHitInFirstPixelBarrel ())), true,w);
     tkcntHistosTkNPixelHits2D[4]->fill(jetFlavour, trackQual, track->hitPattern().numberOfValidPixelHits(), true,w);
     if(n >= 4) continue;
     tkcntHistosSig2D[n]->fill(jetFlavour, trackQual, ip[selectedIndices[n]].ip2d.significance(), true,w);
@@ -670,6 +768,8 @@ void IPTagPlotter<Container, Base>::analyzeTag (const reco::BaseTagInfo * baseTa
     tkcntHistosTkNChiSqr2D[n]->fill(jetFlavour, trackQual, track->normalizedChi2(), true,w);
     tkcntHistosTkPt2D[n]->fill(jetFlavour, trackQual, track->pt(), true,w);
     tkcntHistosTkNHits2D[n]->fill(jetFlavour, trackQual, track->found(), true,w);
+    tkcntHistosTkNStripHits2D[n]->fill(jetFlavour, trackQual, track->found()-track->hitPattern().numberOfValidPixelHits(), true,w);
+    tkcntHistosTkIsFirstPixHit2D[n]->fill(jetFlavour, trackQual, track->hitPattern().hasValidHitInFirstPixelBarrel ()*1+track->hitPattern().hasValidHitInFirstPixelEndcap()*2*(!(track->hitPattern().hasValidHitInFirstPixelBarrel ())), true,w);
     tkcntHistosTkNPixelHits2D[n]->fill(jetFlavour, trackQual, track->hitPattern().numberOfValidPixelHits(), true,w);
   }
   sortedIndices = tagInfo->sortedIndexes(reco::btag::Prob2D);
@@ -730,12 +830,16 @@ void IPTagPlotter<Container, Base>::analyzeTag (const reco::BaseTagInfo * baseTa
     tkcntHistosTkNChiSqr3D[4]->fill(jetFlavour, trackQual, track->normalizedChi2(), true,w);
     tkcntHistosTkPt3D[4]->fill(jetFlavour, trackQual, track->pt(), true,w);
     tkcntHistosTkNHits3D[4]->fill(jetFlavour, trackQual, track->found(), true,w);
+    tkcntHistosTkNStripHits3D[4]->fill(jetFlavour, trackQual, track->found()-track->hitPattern().numberOfValidPixelHits(), true,w);
+    tkcntHistosTkIsFirstPixHit3D[4]->fill(jetFlavour, trackQual, track->hitPattern().hasValidHitInFirstPixelBarrel ()*1+track->hitPattern().hasValidHitInFirstPixelEndcap()*2*(!(track->hitPattern().hasValidHitInFirstPixelBarrel ())), true,w);
     tkcntHistosTkNPixelHits3D[4]->fill(jetFlavour, trackQual, track->hitPattern().numberOfValidPixelHits(), true,w);
     //ghostTrack infos  
     ghostTrackDistanceValuHisto->fill(jetFlavour, trackQual, ip[selectedIndices[n]].distanceToGhostTrack.value(), true,w);
     ghostTrackDistanceSignHisto->fill(jetFlavour, trackQual, ip[selectedIndices[n]].distanceToGhostTrack.significance(), true,w);
     ghostTrackWeightHisto->fill(jetFlavour, trackQual, ip[selectedIndices[n]].ghostTrackWeight, true,w);
     selectedTrackQualHisto->fill(jetFlavour, trackQual,w);
+    nHitsVsEtatHisto->fill(jetFlavour, track->eta(), track->found(), w);
+    nPixelHitsVsEtaHisto->fill(jetFlavour, track->eta(), track->hitPattern().numberOfValidPixelHits(), w);
     if(n >= 4) continue;
     tkcntHistosSig3D[n]->fill(jetFlavour, trackQual, ip[selectedIndices[n]].ip3d.significance(), true,w);
     tkcntHistosVal3D[n]->fill(jetFlavour, trackQual, ip[selectedIndices[n]].ip3d.value(), true,w);
@@ -746,6 +850,8 @@ void IPTagPlotter<Container, Base>::analyzeTag (const reco::BaseTagInfo * baseTa
     tkcntHistosTkNChiSqr3D[n]->fill(jetFlavour, trackQual, track->normalizedChi2(), true,w);
     tkcntHistosTkPt3D[n]->fill(jetFlavour, trackQual, track->pt(), true,w);
     tkcntHistosTkNHits3D[n]->fill(jetFlavour, trackQual, track->found(), true,w);
+    tkcntHistosTkNStripHits3D[n]->fill(jetFlavour, trackQual, track->found()-track->hitPattern().numberOfValidPixelHits(), true,w);
+    tkcntHistosTkIsFirstPixHit3D[n]->fill(jetFlavour, trackQual, track->hitPattern().hasValidHitInFirstPixelBarrel ()*1+track->hitPattern().hasValidHitInFirstPixelEndcap()*2*(!(track->hitPattern().hasValidHitInFirstPixelBarrel ())), true,w);
     tkcntHistosTkNPixelHits3D[n]->fill(jetFlavour, trackQual, track->hitPattern().numberOfValidPixelHits(), true,w);
   }
   sortedIndices = tagInfo->sortedIndexes(reco::btag::Prob3D);
@@ -781,8 +887,8 @@ void IPTagPlotter<Container, Base>::analyzeTag (const reco::BaseTagInfo * baseTa
   }
 
   //still need to implement weights in FlavourHistograms2D
-  trackMultVsJetPtHisto->fill(jetFlavour, tagInfo->jet()->pt()*jec, sortedTracks.size());
-  selectedTrackMultVsJetPtHisto->fill(jetFlavour, tagInfo->jet()->pt()*jec, nSelectedTracks); //tagInfo->selectedTracks().size());
+  trackMultVsJetPtHisto->fill(jetFlavour, tagInfo->jet()->pt()*jec, sortedTracks.size(),w);
+  selectedTrackMultVsJetPtHisto->fill(jetFlavour, tagInfo->jet()->pt()*jec, nSelectedTracks,w); //tagInfo->selectedTracks().size());
 }
 
 template <class Container, class Base> 
@@ -956,6 +1062,10 @@ void IPTagPlotter<Container, Base>::epsPlot(const std::string & name)
     tkcntHistosTkPt3D[n]->epsPlot(name);
     tkcntHistosTkNHits2D[n]->epsPlot(name);
     tkcntHistosTkNHits3D[n]->epsPlot(name);    
+    tkcntHistosTkNStripHits2D[n]->epsPlot(name);
+    tkcntHistosTkNStripHits3D[n]->epsPlot(name);    
+    tkcntHistosTkIsFirstPixHit2D[n]->epsPlot(name);
+    tkcntHistosTkIsFirstPixHit3D[n]->epsPlot(name);    
     tkcntHistosTkNPixelHits2D[n]->epsPlot(name);
     tkcntHistosTkNPixelHits3D[n]->epsPlot(name);
 

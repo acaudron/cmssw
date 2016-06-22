@@ -626,7 +626,7 @@ IPTagPlotter<Container, Base>::IPTagPlotter(const std::string & tagName,
 
   nPixelHitsVsEtaHisto = new FlavourHistograms2D<double, int>
        ("nPixelHitsVsEtaHisto" + theExtensionString, "Pixel Hit multiplicity vs track eta",
-        50, 0.0, 250.0, 11, -0.5, 10.5, false, trackIPDir, mc, true, ibook_);
+        50, -2.4, 2.4, 11, -0.5, 10.5, false, trackIPDir, mc, true, ibook_);
 
 }
 
